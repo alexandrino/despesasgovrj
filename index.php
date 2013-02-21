@@ -2,72 +2,81 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Read File</title>
+	<title>File Import</title>
 </head>
 <body>
 	<?php 
-		include('class/file.class.php');
-		//$file = file_get_contents('' );
-			 
-			$oFile = new File();
-			$oFile->openFile( 'http://riotransparente.rio.rj.gov.br/respostas_desp/resposta_1.asp?ano=2012' );
-			echo $oFile->getFile();
 
- 
-		
+		include('class/file.class.php');
+
+		$oFile = new File();
+		$oFile->openFile( 'http://riotransparente.rio.rj.gov.br/respostas_desp/resposta_1.asp?ano=2012' );
+		echo $oFile->getFile();
+
 	?>
 
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script>
 
 		$(function(){
-
+			
 			sendItensLevel1( getItens() );
 
 		});
-
+		
+		// Function that clean the DOM and returns table's lines Object
 		var getItens = function(){
 
-			var itens = new Array();
-			
+			var items, index;
+			items = {};
+			index = 1;
+
 			$('table:nth(3) tr').each(function(e){
 
-				var tds, tds_length, line;
-				line = new Array();
+				var tds, tds_length, line, col_n;
+				line = {};
 				tds = $(this).find('td');
 				tds_length = tds.length;
+				col_n = 1;
 
 				if(tds_length == 3) {
-
+					
 					tds.each(function(e){
+						
 						var content = $(this).text();
-						if(content != '' ) line.push( content );
-					});
-					itens.push(line);
+						if(col_n == 1) line['codigo'] = content ;
+						else if( col_n == 2) line['orgao'] = content ;
+						else line['valor'] = content ;
+						col_n++;
 
+					});
+
+					items['iten' + index] = line;
+					index++;
 				}
+				
 				
 			});
 	
-			return itens;			
+			return items;			
 		};
 
-		var sendItensLevel1 = function( itens ){
+		// Funtion that send each item via AJAX
+		var sendItensLevel1 = function( items ){
 			
-			var o = '';
+			for( k in items ){
 
-			for( i= 0; i< itens.length; i++ ){
-				var i = 'iten' + i;
-				o =  { 'a' : itens[i][0] }
+				if( k != 'iten1' ){
+					$.ajax({
+						type : 'GET',
+						url : 'ajax/insert-details-lv1.ajax.php',
+						data : items[k]
+					}).done(function(msg){
+						console.log( msg );
+					});					 
+				}
 			}
-			
-		 	console.warn( o );
 
-			$.ajax({
-				type : 'GET',
-				url : 'ajax/insert-details-lv1.ajax.php',
-				data : o
-			})
 		}
 
 	</script>
