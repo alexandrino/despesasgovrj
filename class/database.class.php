@@ -2,15 +2,18 @@
 
 class Database{  
 
-	private db_host = ‘’;  
-	private db_user = ‘’;  
-	private db_pass = ‘’;  
-	private db_name = ‘’;  
+	private $db_host = '';  
+	private $db_user = '';  
+	private $db_pass = '';  
+	private $db_name = '';  
 
 	public function connect(){  
 
         if(!$this->con){  
-            $myconn = @mysql_connect($this->db_host,$this->db_user,$this->db_pass);  
+            $myconn = mysql_connect($this->db_host,$this->db_user,$this->db_pass);  
+
+                var_dump($myconn);exit;
+
             if($myconn) {  
                 $seldb = @mysql_select_db($this->db_name,$myconn);  
                 if($seldb){  

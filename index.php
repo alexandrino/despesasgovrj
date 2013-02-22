@@ -10,7 +10,7 @@
 		include('class/file.class.php');
 
 		$oFile = new File();
-		$oFile->openFile( 'http://riotransparente.rio.rj.gov.br/respostas_desp/resposta_1.asp?ano=2012' );
+		$oFile->openFile( 'http://riotransparente.rio.rj.gov.br/respostas_desp/resposta_5.asp?ano=2012&ua=2951&uo=2951&pt=29512645203864526&fonte=100' );
 		echo $oFile->getFile();
 
 	?>
@@ -19,8 +19,8 @@
 	<script>
 
 		$(function(){
-			
-			sendItensLevel1( getItens() );
+			console.log($('table:nth(3) tr').html());
+			sendItens( getItens(), 'unidade_orcamentaria' );
 
 		});
 		
@@ -62,19 +62,28 @@
 		};
 
 		// Funtion that send each item via AJAX
-		var sendItensLevel1 = function( items ){
+		var sendItens = function( items, type ){
 			
-			for( k in items ){
+			switch( type ){
 
-				if( k != 'iten1' ){
-					$.ajax({
-						type : 'GET',
-						url : 'ajax/insert-details-lv1.ajax.php',
-						data : items[k]
-					}).done(function(msg){
-						console.log( msg );
-					});					 
-				}
+				case 'unidade_orcamentaria' : 
+					for( k in items ){
+						// Set type on the object 
+						items[k]['type'] = 'unidade_orcamentaria';
+						if( k != 'iten1' ){
+							$.ajax({
+								type : 'GET',
+								url : 'ajax/insert-itens.ajax.php',
+								data : items[k] 
+							}).done(function(msg){
+								console.log( msg );
+							});					 
+						}
+					}
+				break;
+
+				default: 
+				break;
 			}
 
 		}
